@@ -1,4 +1,4 @@
-package com.example.onyxdelivery.utils
+package com.example.onyxdelivery.core.utils
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
