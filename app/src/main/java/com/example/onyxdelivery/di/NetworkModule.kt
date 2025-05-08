@@ -1,6 +1,6 @@
 package com.example.onyxdelivery.di
 
-import com.example.onyxdelivery.data.remote.api.OnyxDeliveryApiService
+import com.example.onyxdelivery.data.remote.api.OnyxApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object NetworkModule {
 
     @Provides
-    fun provideRouteApiService(): OnyxDeliveryApiService {
+    fun provideRouteApiService(): OnyxApiService {
 
         val baseURL = "http://mdev.yemensoft.net:8087/OnyxDeliveryService/Service.svc/"
 
@@ -22,6 +22,6 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        return retrofit.create(OnyxDeliveryApiService::class.java)
+        return retrofit.create(OnyxApiService::class.java)
     }
 }
