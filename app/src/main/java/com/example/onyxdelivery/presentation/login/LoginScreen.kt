@@ -22,9 +22,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -54,6 +51,8 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit = { navController.navigate("home_screen") }
 ) {
 
+    val screenState by viewModel.screenState.collectAsState()
+
     val systemUiController = rememberSystemUiController()
 
     SideEffect {
@@ -63,13 +62,17 @@ fun LoginScreen(
         )
     }
 
-    val loginState by viewModel.loginState.collectAsState()
+    val loginState by viewModel.loginResultState.collectAsState()
 
     LoginContent(
+        screenState = screenState,
         onLoginClick = { userId, password ->
             viewModel.login(userId, password)
         },
-        loginState = loginState
+        loginState = loginState,
+        onChangePassword = viewModel::onChangePassword,
+        onChangeUserId = viewModel::onChangeUserID,
+        onChangeErrorMessage = viewModel::onChangeErrorMessage
     )
 
     if (loginState is Resource.Success) {
@@ -81,12 +84,14 @@ fun LoginScreen(
 
 @Composable
 fun LoginContent(
+    onChangeErrorMessage: (String?) -> Unit,
+    onChangeUserId: (String) -> Unit,
+    onChangePassword: (String) -> Unit,
+    screenState: LoginState,
     onLoginClick: (deliveryNo: String, password: String) -> Unit,
     loginState: Resource<LoginResponseDto>
 ) {
-    var userId by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var errorText by remember { mutableStateOf<String?>(null) }
+
 
     ConstraintLayout(
         modifier = Modifier
@@ -172,10 +177,10 @@ fun LoginContent(
         }
 
         TextField(
-            value = userId,
+            value = screenState.userId,
             onValueChange = {
-                userId = it
-                errorText = null
+                onChangeUserId(it)
+                onChangeErrorMessage(null)
             },
             placeholder = {
                 Text(
@@ -212,10 +217,10 @@ fun LoginContent(
         )
 
         TextField(
-            value = password,
+            value = screenState.password,
             onValueChange = {
-                password = it
-                errorText = null
+                onChangePassword(it)
+                onChangeErrorMessage(null)
             },
             visualTransformation = PasswordVisualTransformation(),
             placeholder = {
@@ -253,10 +258,10 @@ fun LoginContent(
         )
 
         if (loginState is Resource.Error) {
-            errorText = loginState.message
+            onChangeErrorMessage(loginState.message)
         }
 
-        errorText?.let { msg ->
+        screenState.errorText?.let { msg ->
             Text(
                 text = msg,
                 color = Color.Red,
@@ -283,10 +288,10 @@ fun LoginContent(
 
         Button(
             onClick = {
-                if (userId.isBlank() || password.isBlank()) {
-                    errorText = "Please fill in both fields"
+                if (screenState.userId.isBlank() || screenState.password.isBlank()) {
+                    onChangeErrorMessage("Please fill in both fields")
                 } else {
-                    onLoginClick(userId, password)
+                    onLoginClick(screenState.userId, screenState.password)
                 }
             },
             modifier = Modifier

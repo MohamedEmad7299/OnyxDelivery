@@ -1,5 +1,5 @@
 package com.example.onyxdelivery.data.model.dto
 
 data class LoginRequestDto(
-    val value: Value
+    val value: LoginValue
 )
