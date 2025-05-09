@@ -25,6 +25,7 @@ class OnyxRepositoryImpl @Inject constructor(
         } catch (e: HttpException) {
             throw NetworkException("Server error: ${e.code()}")
         } catch (e: Exception) {
+            e.printStackTrace()
             throw OnyxException("Unexpected error occurred during login")
         }
     }

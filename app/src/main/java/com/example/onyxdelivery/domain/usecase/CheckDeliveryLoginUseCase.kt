@@ -24,7 +24,7 @@ class CheckDeliveryLoginUseCase @Inject constructor(
         } catch (e: HttpException) {
             Resource.Error("Server error: ${e.code()}", e)
         } catch (e: Exception) {
-            Resource.Error("Unexpected login error", e)
+            Resource.Error("Unexpected login error ${e.message}", e)
         }
     }
 }

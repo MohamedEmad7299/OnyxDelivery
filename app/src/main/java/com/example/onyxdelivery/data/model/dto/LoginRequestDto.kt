@@ -1,7 +1,7 @@
 package com.example.onyxdelivery.data.model.dto
 
 data class LoginRequestDto(
-    val deliveryNo: String,
-    val password: String,
-    val languageNo: Int
+    val P_LANG_NO: String,
+    val P_DLVRY_NO: String,
+    val P_PSSWRD: Int
 )

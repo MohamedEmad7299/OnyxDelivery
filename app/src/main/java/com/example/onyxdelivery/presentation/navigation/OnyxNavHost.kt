@@ -1,0 +1,32 @@
+package com.example.onyxdelivery.presentation.navigation
+
+import android.annotation.SuppressLint
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.onyxdelivery.core.utils.Screen
+import com.example.onyxdelivery.presentation.home.ui.HomeScreen
+import com.example.onyxdelivery.presentation.login.LoginScreen
+import com.example.onyxdelivery.presentation.splash.SplashScreen
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun OnyxNavHost(){
+
+    val navController = rememberNavController()
+    val backStackEntry = navController.currentBackStackEntryAsState()
+
+    Scaffold{
+        NavHost(
+            navController = navController,
+            startDestination = Screen.LoginScreen.route
+        ){
+            composable(Screen.SplashScreen.route){ SplashScreen(navController = navController) }
+            composable(Screen.LoginScreen.route){ LoginScreen(navController = navController) }
+            composable(Screen.HomeScreen.route){ HomeScreen(navController = navController) }
+        }
+    }
+}

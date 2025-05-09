@@ -1,15 +1,15 @@
 package com.example.onyxdelivery.data.model.dto
 
 data class LoginResponseDto(
-    val data: LoginData?,
-    val result: LoginResult
+    val Data: LoginData?,
+    val Result: LoginResult
 )
 
 data class LoginData(
-    val deliveryName: String
+    val DeliveryName: String
 )
 
 data class LoginResult(
-    val errNo: Int,
-    val errMsg: String
+    val ErrNo: Int,
+    val ErrMsg: String
 )

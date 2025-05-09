@@ -1,6 +1,5 @@
 package com.example.onyxdelivery.domain.usecase
 
-import com.example.onyxdelivery.core.exception.CacheException
 import com.example.onyxdelivery.core.utils.Resource
 import com.example.onyxdelivery.data.mapper.toEntity
 import com.example.onyxdelivery.data.model.dto.DeliveryBill
