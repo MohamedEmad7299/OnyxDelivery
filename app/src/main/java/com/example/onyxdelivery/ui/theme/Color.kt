@@ -14,4 +14,8 @@ val IcySky = Color(0xFFE9FAFF)
 val DeepOceanBlue = Color(0xFF004F62)
 val White = Color(0xFFFFFFFF)
 val CloudBlue  = Color(0xFFF1F5FB)
+val DarkGray  = Color(0x0000004D)
+val MintFrost = Color(0xFFCBFFCB)
+val MidnightBlue = Color(0xFF0A3F8F)
+
 
