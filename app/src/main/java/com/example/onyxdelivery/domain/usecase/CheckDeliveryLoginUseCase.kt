@@ -14,17 +14,23 @@ class CheckDeliveryLoginUseCase @Inject constructor(
     suspend operator fun invoke(request: LoginRequestDto): Resource<LoginResponseDto> {
         return try {
             val response = repository.checkDeliveryLogin(request)
-            if (response.isSuccessful && response.body() != null) {
-                Resource.Success(response.body()!!)
-            } else {
-                Resource.Error("Login failed: ${response.message()}")
-            }
+            val body = response.body()
+
+            if (response.isSuccessful && body != null) {
+                println(body.Result.ErrNo)
+                if (body.Result.ErrNo == "0") {
+                    Resource.Success(body)
+                } else {
+                    Resource.Error("Login failed, check your credentials")
+                }
+            } else Resource.Error("Login failed")
+
         } catch (e: IOException) {
             Resource.Error("Network error", e)
         } catch (e: HttpException) {
             Resource.Error("Server error: ${e.code()}", e)
         } catch (e: Exception) {
-            Resource.Error("Unexpected login error ${e.message}", e)
+            Resource.Error("Unexpected login error: ${e.localizedMessage}", e)
         }
     }
 }

@@ -10,6 +10,6 @@ data class LoginData(
 )
 
 data class LoginResult(
-    val ErrNo: Int,
+    val ErrNo: String,
     val ErrMsg: String
 )

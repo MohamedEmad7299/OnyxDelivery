@@ -15,7 +15,7 @@ object NetworkModule {
     @Provides
     fun provideRouteApiService(): OnyxApiService {
 
-        val baseURL = "http://mdev.yemensoft.net:8087/OnyxDeliveryService/Service.svc/"
+        val baseURL = "https://mdev.yemensoft.net:473/OnyxDeliveryService/Service.svc/"
 
         val retrofit = Retrofit.Builder()
             .baseUrl(baseURL)
