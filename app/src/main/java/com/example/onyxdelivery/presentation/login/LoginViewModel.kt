@@ -3,7 +3,7 @@ package com.example.onyxdelivery.presentation.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.onyxdelivery.core.utils.Resource
-import com.example.onyxdelivery.data.local.session.SessionManager
+import com.example.onyxdelivery.data.local.session.PreferencesSessionManager
 import com.example.onyxdelivery.data.model.dto.LoginRequestDto
 import com.example.onyxdelivery.data.model.dto.LoginResponseDto
 import com.example.onyxdelivery.data.model.dto.LoginValue
@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUseCase: CheckDeliveryLoginUseCase,
-    private val sessionManager: SessionManager
+    private val preferencesSessionManager: PreferencesSessionManager
 ) : ViewModel() {
 
 
@@ -47,7 +47,7 @@ class LoginViewModel @Inject constructor(
             ))
             _loginResultState.value = result
             if (result is Resource.Success) {
-                sessionManager.setLoggedIn(true)
+                preferencesSessionManager.setLoggedIn(true)
             }
         }
     }

@@ -1,8 +1,6 @@
 package com.example.onyxdelivery.presentation.language
 
 import androidx.lifecycle.ViewModel
-import com.example.onyxdelivery.data.local.session.SessionManager
-import com.example.onyxdelivery.domain.usecase.CheckDeliveryLoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
