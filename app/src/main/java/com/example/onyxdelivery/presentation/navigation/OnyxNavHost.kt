@@ -21,7 +21,7 @@ fun OnyxNavHost(){
     Scaffold{
         NavHost(
             navController = navController,
-            startDestination = Screen.HomeScreen.route
+            startDestination = Screen.SplashScreen.route
         ){
             composable(Screen.SplashScreen.route){ SplashScreen(navController = navController) }
             composable(Screen.LoginScreen.route){ LoginScreen(navController = navController) }

@@ -3,10 +3,8 @@ package com.example.onyxdelivery.presentation.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -63,16 +61,22 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val billsState by viewModel.billsState.collectAsState()
+    val screenState by viewModel.screenState.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.loadBills("1010") // Replace with session-based delivery number
+        viewModel.loadBills("1010")
     }
-
-    HomeContent(billsState = billsState)
+    HomeContent(
+        billsState = billsState,
+        screenState = screenState,
+        onTabSelected = viewModel::onChangeTab
+    )
 }
 
 @Composable
 fun HomeContent(
+    screenState: HomeState,
+    onTabSelected: (String) -> Unit,
     billsState: Resource<List<DeliveryItemEntity>>,
 ) {
     ConstraintLayout(
@@ -100,35 +104,54 @@ fun HomeContent(
                 start.linkTo(parent.start, 16.dp)
             }
         ) {
-            Text("Ahmed", fontSize = 24.sp, fontFamily = FontFamily(Font(R.font.montserrat_medium)), color = Color.White)
+            Text(
+                "Ahmed",
+                fontSize = 24.sp,
+                fontFamily = FontFamily(Font(R.font.montserrat_medium)),
+                color = Color.White
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            Text("Othman", fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily(Font(R.font.montserrat_semibold)), color = Color.White)
+            Text(
+                "Othman",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
+                color = Color.White
+            )
         }
 
         Image(
-            modifier = Modifier.constrainAs(circle) {
-                top.linkTo(parent.top)
-                end.linkTo(parent.end)
-            }.height(160.dp).width(160.dp),
+            modifier = Modifier
+                .constrainAs(circle) {
+                    top.linkTo(parent.top)
+                    end.linkTo(parent.end)
+                }
+                .height(160.dp)
+                .width(160.dp),
             painter = painterResource(id = R.drawable.circle_blue),
             contentDescription = "blue circle",
         )
 
         Image(
-            modifier = Modifier.constrainAs(rider) {
-                top.linkTo(parent.top, 24.dp)
-                start.linkTo(name.end, 56.dp)
-            }.height(160.dp).width(160.dp),
+            modifier = Modifier
+                .constrainAs(rider) {
+                    top.linkTo(parent.top, 24.dp)
+                    start.linkTo(name.end, 56.dp)
+                }
+                .height(160.dp)
+                .width(160.dp),
             painter = painterResource(id = R.drawable.deliveryman),
             contentDescription = "rider",
         )
 
         IconButton(
             onClick = { },
-            modifier = Modifier.size(48.dp).constrainAs(language) {
-                top.linkTo(parent.top, margin = 48.dp)
-                end.linkTo(parent.end, margin = 16.dp)
-            }
+            modifier = Modifier
+                .size(48.dp)
+                .constrainAs(language) {
+                    top.linkTo(parent.top, margin = 48.dp)
+                    end.linkTo(parent.end, margin = 16.dp)
+                }
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.language),
@@ -143,19 +166,21 @@ fun HomeContent(
                 start.linkTo(parent.start, 16.dp)
                 end.linkTo(parent.end, 16.dp)
             },
-            selectedTab = "New",
-            onTabSelected = {}
+            selectedTab = screenState.selectedTab,
+            onTabSelected = onTabSelected
         )
 
         when (billsState) {
 
             is Resource.Loading -> Box(
-                modifier = Modifier.constrainAs(loader) {
-                    top.linkTo(toggle.bottom, 32.dp)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }.fillMaxSize(),
+                modifier = Modifier
+                    .constrainAs(loader) {
+                        top.linkTo(toggle.bottom, 32.dp)
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(
@@ -166,22 +191,30 @@ fun HomeContent(
             }
 
             is Resource.Success -> {
-                val items = (billsState).data
+                val items = if (screenState.selectedTab == "New") billsState.data.filter {
+                    it.status == "0"
+                } else billsState.data.filter {
+                    it.status != "0"
+                }
                 if (items.isEmpty()) {
                     EmptyHome(
-                        modifier = Modifier.constrainAs(emptyHome) {
-                            top.linkTo(toggle.bottom, 16.dp)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }.fillMaxSize()
+                        modifier = Modifier
+                            .constrainAs(emptyHome) {
+                                top.linkTo(toggle.bottom, 16.dp)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                            }
+                            .fillMaxSize()
                     )
                 } else {
                     LazyColumn(
-                        modifier = Modifier.constrainAs(list) {
-                            top.linkTo(toggle.bottom, 16.dp)
-                            bottom.linkTo(parent.bottom)
-                        }.padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        modifier = Modifier
+                            .constrainAs(list) {
+                                top.linkTo(toggle.bottom, 16.dp)
+                                start.linkTo(parent.start, 16.dp)
+                                end.linkTo(parent.end, 16.dp)
+                            }
+                            .padding(top = 16.dp, bottom = 320.dp)
                     ) {
                         items(items) { item ->
                             DeliveryCard(item = item)
@@ -189,15 +222,19 @@ fun HomeContent(
                     }
                 }
             }
+
             is Resource.Error -> {
                 EmptyHome(
-                    modifier = Modifier.constrainAs(emptyHome) {
-                        top.linkTo(toggle.bottom, 16.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }.fillMaxSize()
+                    modifier = Modifier
+                        .constrainAs(emptyHome) {
+                            top.linkTo(toggle.bottom, 16.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .fillMaxSize()
                 )
             }
+
             else -> {}
         }
     }
@@ -206,13 +243,13 @@ fun HomeContent(
 @Composable
 fun EmptyHome(
     modifier: Modifier = Modifier
-){
+) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxWidth()
-    ){
+    ) {
 
         Image(
             modifier = Modifier
@@ -265,7 +302,6 @@ fun ToggleSegmentedControl(
             Box(
                 modifier = Modifier
                     .width(120.dp)
-                    .clip(RoundedCornerShape(50))
                     .background(if (isSelected) Color(0xFF004D5F) else Color.White)
                     .clickable { onTabSelected(option) }
                     .padding(vertical = 12.dp),
@@ -284,17 +320,12 @@ fun ToggleSegmentedControl(
 
 
 @Composable
-fun DeliveryCard(item: DeliveryItemEntity = DeliveryItemEntity(
-    mobileNo = "123456789",
-    date = "2023-10-01",
-    price = "100.00",
-    status = "0"
-)
-) {
+fun DeliveryCard(item: DeliveryItemEntity) {
 
     Card(
         modifier = Modifier
             .background(White)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth()
             .height(100.dp),
         shape = RoundedCornerShape(16.dp),
@@ -305,7 +336,7 @@ fun DeliveryCard(item: DeliveryItemEntity = DeliveryItemEntity(
             modifier = Modifier
                 .background(White)
                 .fillMaxSize()
-        ){
+        ) {
             val (
                 mobileNo,
                 orderDetails,
@@ -316,8 +347,9 @@ fun DeliveryCard(item: DeliveryItemEntity = DeliveryItemEntity(
                 divider2,
             ) = createRefs()
 
-            Text("#${item.mobileNo}",
-                modifier = Modifier.constrainAs(mobileNo){
+            Text(
+                "#${item.mobileNo}",
+                modifier = Modifier.constrainAs(mobileNo) {
                     start.linkTo(parent.start, 16.dp)
                     top.linkTo(parent.top, 4.dp)
                 },
@@ -328,7 +360,7 @@ fun DeliveryCard(item: DeliveryItemEntity = DeliveryItemEntity(
 
             Box(
                 modifier = Modifier
-                    .constrainAs(orderDetails){
+                    .constrainAs(orderDetails) {
                         top.linkTo(parent.top)
                         end.linkTo(parent.end)
                     }
@@ -338,22 +370,28 @@ fun DeliveryCard(item: DeliveryItemEntity = DeliveryItemEntity(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Order",
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily(Font(R.font.montserrat_regular))
-                        )
-                    Text("Details",
+                    Text(
+                        "Order",
                         color = Color.White,
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(R.font.montserrat_regular))
                     )
-                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Go", tint = Color.White)
+                    Text(
+                        "Details",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontFamily = FontFamily(Font(R.font.montserrat_regular))
+                    )
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "Go",
+                        tint = Color.White
+                    )
                 }
             }
 
             InfoColumn(
-                modifier = Modifier.constrainAs(statusColumn){
+                modifier = Modifier.constrainAs(statusColumn) {
                     start.linkTo(parent.start, 16.dp)
                     top.linkTo(parent.top, 28.dp)
                 },
@@ -363,14 +401,14 @@ fun DeliveryCard(item: DeliveryItemEntity = DeliveryItemEntity(
             )
 
             DividerLine(
-                modifier = Modifier.constrainAs(divider1){
+                modifier = Modifier.constrainAs(divider1) {
                     top.linkTo(parent.top)
                     start.linkTo(statusColumn.end, 12.dp)
                 }
             )
 
             InfoColumn(
-                modifier = Modifier.constrainAs(priceColumn){
+                modifier = Modifier.constrainAs(priceColumn) {
                     start.linkTo(divider1.start, 16.dp)
                     top.linkTo(parent.top, 28.dp)
                 },
@@ -379,14 +417,14 @@ fun DeliveryCard(item: DeliveryItemEntity = DeliveryItemEntity(
             )
 
             DividerLine(
-                modifier = Modifier.constrainAs(divider2){
+                modifier = Modifier.constrainAs(divider2) {
                     top.linkTo(parent.top)
                     start.linkTo(priceColumn.end, 12.dp)
                 }
             )
 
             InfoColumn(
-                modifier = Modifier.constrainAs(dateColumn){
+                modifier = Modifier.constrainAs(dateColumn) {
                     start.linkTo(divider2.start, 16.dp)
                     top.linkTo(parent.top, 28.dp)
                 },
@@ -403,11 +441,11 @@ fun InfoColumn(
     title: String,
     subTitle: String,
     subtitleColor: Color = DeepOceanBlue
-){
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .width(IntrinsicSize.Min)
+            .width(70.dp)
     ) {
         Text(
             title,
@@ -434,11 +472,11 @@ fun InfoColumn(
 @Composable
 fun DividerLine(
     modifier: Modifier = Modifier
-){
+) {
     VerticalDivider(
         modifier = modifier
             .fillMaxHeight()
-            .padding(top = 32.dp , bottom = 12.dp)
+            .padding(top = 32.dp, bottom = 12.dp)
             .width(1.dp),
         color = SteelGray
     )

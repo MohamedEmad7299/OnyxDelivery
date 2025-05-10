@@ -1,6 +1,6 @@
 package com.example.onyxdelivery.data.model.dto
 
 data class GetDeliveryBillsItemsResponseDto(
-    val data: Data,
-    val result: Result
+    val Data: Data,
+    val Result: Result
 )
