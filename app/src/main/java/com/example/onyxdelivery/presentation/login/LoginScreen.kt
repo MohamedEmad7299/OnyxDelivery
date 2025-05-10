@@ -48,7 +48,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel = hiltViewModel(),
-    onLoginSuccess: () -> Unit = { navController.navigate("home_screen") }
+    onLoginSuccess: () -> Unit = { navController.navigate("language_screen") }
 ) {
 
     val screenState by viewModel.screenState.collectAsState()
