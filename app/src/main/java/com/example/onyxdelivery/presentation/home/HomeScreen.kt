@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -54,6 +55,7 @@ import com.example.onyxdelivery.ui.theme.DeepOceanBlue
 import com.example.onyxdelivery.ui.theme.Firestorm
 import com.example.onyxdelivery.ui.theme.SteelGray
 import com.example.onyxdelivery.ui.theme.White
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun HomeScreen(
@@ -62,6 +64,15 @@ fun HomeScreen(
 ) {
     val billsState by viewModel.billsState.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
+
+    val systemUiController = rememberSystemUiController()
+
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = Color.Transparent,
+            darkIcons = true
+        )
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loadBills("1010")
@@ -214,7 +225,7 @@ fun HomeContent(
                                 start.linkTo(parent.start, 16.dp)
                                 end.linkTo(parent.end, 16.dp)
                             }
-                            .padding(top = 16.dp, bottom = 320.dp)
+                            .padding(bottom = 320.dp)
                     ) {
                         items(items) { item ->
                             DeliveryCard(item = item)
